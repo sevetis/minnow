@@ -1,6 +1,12 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <deque>
+
+struct seg {
+  uint64_t st, ed;
+  std::string str;
+};
 
 class Reassembler
 {
@@ -42,4 +48,15 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+
+  uint64_t cur_idx = 0;
+  uint64_t end_idx = -1;
+  uint64_t bytes_pending_ = 0;
+
+  void push__(std::string data);
+  void push_(uint64_t f_idx, std::string data);
+  void store_(uint64_t f_idx, std::string data);
+  uint64_t cap_() const;
+
+  std::deque<seg> stored = std::deque<seg>{};
 };
