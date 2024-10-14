@@ -103,6 +103,7 @@ void Reassembler::store_(uint64_t f_idx, string data) {
       }
       string merge = nx.str.substr(seg.ed - nx.st);
       bytes_pending_ -= nx.str.size() - merge.size();
+      nx.str.clear();
       seg.str += merge;
       seg.ed = nx.ed;
     }
@@ -112,46 +113,3 @@ void Reassembler::store_(uint64_t f_idx, string data) {
   stored.push_back({f_idx, l_idx, data});
   bytes_pending_ += data.size();
 }
-
-// void Reassembler::store_(uint64_t f_idx, string data) {
-//   uint64_t boundary = cur_idx + cap_();
-//   uint64_t l_idx = f_idx + data.size();
-//   if (l_idx > boundary) {
-//     data = data.substr(0, boundary - f_idx);
-//     l_idx = f_idx + data.size();
-//   }
-//   if (data.empty()) return;
-
-//   uint64_t l = 0, r = stored.size() - 1;
-//   while (l < r) {
-//     uint64_t m = (l + r + 1) / 2;
-//     if (stored[m].ed < f_idx)
-//       l = m;
-//     else
-//       r = m - 1;
-//     cout << "1";
-//   }
-
-//   if (r == stored.size() - 1) {
-//     stored.push_back({f_idx, l_idx, data});
-//     bytes_pending_ += data.size();
-//   } else {
-//     auto& seg = stored[r + 1];
-//     if (l_idx < seg.st) {
-//       stored.insert(stored.begin() + r + 1, {f_idx, l_idx, data});
-//       bytes_pending_ += data.size();
-//     } else {
-//       f_idx = min(f_idx, seg.st), l_idx = max(l_idx, seg.ed);
-//       bytes_pending_ += l_idx - f_idx - seg.str.size();
-//       if (f_idx < seg.st && seg.ed < l_idx) {
-//         seg.st = f_idx, seg.ed = l_idx, seg.str = data;
-//       } else if (f_idx < seg.st) {
-//         seg.str = data + seg.str.substr(l_idx - seg.st);
-//         seg.st = f_idx;
-//       } else {
-//         seg.str = seg.str.substr(0, f_idx - seg.st) + data;
-//         seg.ed = l_idx;
-//       }
-//     }
-//   }
-// }
