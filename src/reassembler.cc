@@ -4,7 +4,6 @@ using namespace std;
 
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
 {
-  // Your code here.
   uint64_t last_index = first_index + data.size();
   if (is_last_substring)
     end_idx = last_index;
@@ -21,7 +20,6 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 
 uint64_t Reassembler::bytes_pending() const
 {
-  // Your code here.
   return bytes_pending_;
 }
 
@@ -34,17 +32,17 @@ void Reassembler::push_(uint64_t f_idx, string data) {
     data = data.substr(cur_idx - f_idx);
   push__(std::move(data));
 
-  while (!stored.empty() && stored.front().ed <= cur_idx) {
-    bytes_pending_ -= stored.front().str.size();
-    stored.pop_front();
+  while (!storage.empty() && storage.front().ed <= cur_idx) {
+    bytes_pending_ -= storage.front().str.size();
+    storage.pop_front();
   }
 
-  while (cap_() && !stored.empty()) {
-    auto& seg = stored.front();
+  while (cap_() && !storage.empty()) {
+    auto& seg = storage.front();
     if (seg.st <= cur_idx && cur_idx < seg.ed) {
       bytes_pending_ -= seg.str.size();
       push__(seg.str.substr(cur_idx - seg.st));
-      stored.pop_front();
+      storage.pop_front();
     } else {
       break;
     }
@@ -67,49 +65,24 @@ void Reassembler::store_(uint64_t f_idx, string data) {
   }
   if (data.empty()) return;
 
-  for (uint64_t i = 0; i < stored.size(); i++) {
-    auto& seg = stored[i];
-    if (seg.ed < f_idx) continue;
-    if (seg.st <= f_idx && l_idx <= seg.ed) return;
-    if (l_idx < seg.st) {
-      stored.insert(stored.begin() + i, {f_idx, l_idx, data});
-      bytes_pending_ += data.size();
-      return;
-    }
-
-    if (seg.st <= f_idx && f_idx <= seg.ed) {
-      data = data.substr(seg.ed - f_idx);
-      bytes_pending_ += data.size();
-      seg.str += data;
-      seg.ed = l_idx;
-    } else if (seg.st <= l_idx && l_idx <= seg.ed) {
-      data = data.substr(0, seg.st - f_idx);
-      bytes_pending_ += data.size();
-      seg.str = data + seg.str;
-      seg.st = f_idx;
-    } else if (f_idx < seg.st && seg.ed < l_idx) {
-      bytes_pending_ += data.size() - seg.str.size();
-      seg.str = data;
-      seg.st = f_idx;
-      seg.ed = l_idx;
-    }
-
-    for (uint64_t j = i + 1; j < stored.size(); j++) {
-      auto& nx = stored[j];
-      if (seg.ed < nx.st) break;
-      if (seg.ed >= nx.ed) {
-        bytes_pending_ -= nx.str.size();
-        continue;
-      }
-      string merge = nx.str.substr(seg.ed - nx.st);
-      bytes_pending_ -= nx.str.size() - merge.size();
-      nx.str.clear();
-      seg.str += merge;
-      seg.ed = nx.ed;
-    }
-    return;
+  seg _seg = {f_idx, l_idx, data};
+  auto it = lower_bound(storage.begin(), storage.end(), _seg);
+  if (it != storage.begin() && (it - 1)->ed > f_idx) {
+    if ((it - 1)->ed >= l_idx) return;
+    _seg.str = _seg.str.substr((it - 1)->ed - f_idx);
+    _seg.st = (it - 1)->ed;
   }
 
-  stored.push_back({f_idx, l_idx, data});
-  bytes_pending_ += data.size();
+  while (it != storage.end() && _seg.ed > it->st) {
+    if (it->ed > _seg.ed) {
+      _seg.str += it->str.substr(_seg.ed - it->st);
+      _seg.ed = it->ed;
+    }
+    bytes_pending_ -= it->str.size();
+    storage.erase(it);
+    it = lower_bound(storage.begin(), storage.end(), _seg);
+  }
+
+  bytes_pending_ += _seg.str.size();
+  storage.insert(it, _seg);
 }

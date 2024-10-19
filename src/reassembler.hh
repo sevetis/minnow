@@ -6,6 +6,9 @@
 struct seg {
   uint64_t st, ed;
   std::string str;
+  bool operator < (const seg& other) const {
+    return st < other.st;
+  }
 };
 
 class Reassembler
@@ -36,7 +39,7 @@ public:
    */
   void insert( uint64_t first_index, std::string data, bool is_last_substring );
 
-  // How many bytes are stored in the Reassembler itself?
+  // How many bytes are storage in the Reassembler itself?
   uint64_t bytes_pending() const;
 
   // Access output stream reader
@@ -58,5 +61,5 @@ private:
   void store_(uint64_t f_idx, std::string data);
   uint64_t cap_() const;
 
-  std::deque<seg> stored = std::deque<seg>{};
+  std::deque<seg> storage = std::deque<seg>{};
 };
