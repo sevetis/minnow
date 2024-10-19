@@ -27,4 +27,9 @@ public:
 
 private:
   Reassembler reassembler_;
+  std::optional<Wrap32> zero_point = std::nullopt;
+  bool SYN = false;
+  bool FIN = false;
+
+  uint64_t received_() const;
 };
