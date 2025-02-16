@@ -1,5 +1,5 @@
 #include "byte_stream.hh"
-#include <iostream>
+
 using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
@@ -8,13 +8,12 @@ void Writer::push( string data )
 {  
   for (auto byte: data) {
     if (available_capacity() > 0) {
-      stream.push_back(byte);
+      stream.push(byte);
       pushed_++;
     } else {
       break;
     }
   }
-  peek_ = string{stream.front()};
 }
 
 void Writer::close()
@@ -39,7 +38,10 @@ uint64_t Writer::bytes_pushed() const
 
 string_view Reader::peek() const
 {
-  return string_view{peek_};
+  if (stream.size() > 0) {
+    return string_view(&stream.front(), 1);
+  }
+  return string_view{};
 }
 
 void Reader::pop( uint64_t len )
@@ -47,12 +49,7 @@ void Reader::pop( uint64_t len )
   len = min(len, stream.size());
   popped_ += len;
   while (len-- > 0) {
-    stream.pop_front();
-  }
-  if (stream.size() > 0) {
-    peek_ = string{stream.front()};
-  } else {
-    peek_ = "";
+    stream.pop();
   }
 }
 

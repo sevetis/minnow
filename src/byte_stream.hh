@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
-#include <deque>
+#include <queue>
 
 class Reader;
 class Writer;
@@ -28,10 +28,9 @@ protected:
   bool error_ {};
   bool closed_ {};
 
-  std::deque<char> stream {};
+  std::queue<char> stream {};
   uint64_t pushed_ {};
   uint64_t popped_ {};
-  std::string peek_ {};
 };
 
 class Writer : public ByteStream
