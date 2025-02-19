@@ -1,8 +1,4 @@
 #include "reassembler.hh"
-#include <cstdint>
-
-#include <iostream>
-#include <string>
 
 using namespace std;
 
@@ -11,51 +7,42 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   uint64_t last_index = first_index + data.size();
   if (is_last_substring)
     end_index_ = last_index;
-cout << first_index << endl;
   uint64_t acc_left = max(first_index, next_left_);
   uint64_t acc_right = min(
     next_left_ + output_.writer().available_capacity(),
     last_index
   );
   if (acc_right < acc_left) return;
-cout << "acc left: " << acc_left << " acc right: " << acc_right << endl;
   data = data.substr(acc_left - first_index, acc_right - acc_left);
-cout << " data: " << data << endl;
-
-for (auto& [i, s]: pendings_) {
-  cout << i << " -> " << s << endl;
+  store_(acc_left, acc_right, std::move(data));
+  push_();
 }
-cout << "------------" << endl;
 
-  auto it = pendings_.upper_bound(acc_left);
-  if (it != pendings_.begin()) {
+void Reassembler::store_(uint64_t left, uint64_t right, string data) {
+  auto it = pendings_.upper_bound(left);
+  if (it != pendings_.begin()) { // merge left
     auto [l, d] = *std::prev(it);
-    if (acc_left <= l + d.size()) {
-cout << "L: " << l << endl;
-cout << "<1>: " << data << endl;
-      data = d.substr(0, acc_left - l);
-      acc_left = l;
+    uint64_t r = l + d.size();
+    if (left <= r) {
+      if (right <= r)
+        data = d;
+      else
+        data = d.substr(0, left - l) + data;
+      left = l;
       pendings_.erase(l);
     }
   }
-  while (it != pendings_.end() && acc_right >= it->first) {
+  while (it != pendings_.end() && right >= it->first) { // merge right
     auto [l, d] = *it;
-    uint64_t r = l + data.size();
-    if (acc_right < r) {
-      acc_right = l + data.size();
-cout << "2" << endl;
-      data = data.substr(0, l - acc_left) + d;
+    uint64_t r = l + d.size();
+    if (right < r) {
+      right = r;
+      data = data.substr(0, l - left) + d;
     }
     ++it;
     pendings_.erase(l);
   }
-  pendings_[acc_left] = data;
-
-for (auto& [i, s]: pendings_) {
-  cout << i << " -> " << s << endl;
-}
-
-  push_();
+  pendings_[left] = data;
 }
 
 void Reassembler::push_() {
@@ -63,8 +50,6 @@ void Reassembler::push_() {
     auto [st_index, data] = *pendings_.begin();
     pendings_.erase(st_index);
     if (next_left_ < st_index + data.size()) {
-cout << "3" << endl;
-cout << "nxt: " << next_left_ << " st: " << st_index << " data: " << data << endl;
       output_.writer().push(data.substr(next_left_ - st_index));
       next_left_ = st_index + data.size();
     }
@@ -72,10 +57,6 @@ cout << "nxt: " << next_left_ << " st: " << st_index << " data: " << data << end
   if (next_left_ == end_index_) {
     output_.writer().close();
   }
-cout << "+++++++++++" << endl;
-for (auto& [i, s]: pendings_) {
-  cout << i << " -> " << s << endl;
-}
 }
 
 // How many bytes are stored in the Reassembler itself?
