@@ -32,6 +32,9 @@ public:
    */
   void insert( uint64_t first_index, std::string data, bool is_last_substring );
 
+  // set error
+  void set_error();
+
   // How many bytes are stored in the Reassembler itself?
   // This function is for testing only; don't add extra state to support it.
   uint64_t count_bytes_pending() const;

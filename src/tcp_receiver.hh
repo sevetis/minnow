@@ -27,4 +27,6 @@ public:
 
 private:
   Reassembler reassembler_;
+  std::optional<Wrap32> zero_ {};
+  std::optional<Wrap32> ackno_ {};
 };

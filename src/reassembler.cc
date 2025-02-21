@@ -68,3 +68,7 @@ uint64_t Reassembler::count_bytes_pending() const
     size += data.size();
   return size;
 }
+
+void Reassembler::set_error() {
+  output_.set_error();
+}
