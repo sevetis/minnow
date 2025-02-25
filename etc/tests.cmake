@@ -62,6 +62,8 @@ ttest(no_skip)
 
 add_custom_target (check0 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R 'webget|^byte_stream_|^no_skip')
 
+add_custom_target (check_byte_stream COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^byte_stream_|^no_skip')
+
 add_custom_target (check_webget COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --timeout 15 -R 'webget')
 
 add_custom_target (check1 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^byte_stream_|^reassembler_|^no_skip')
@@ -70,9 +72,9 @@ add_custom_target (check2 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --s
 
 add_custom_target (check3 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^byte_stream_|^reassembler_|^wrapping|^recv|^send|^no_skip')
 
-add_custom_target (check4 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^net_interface|^no_skip')
+add_custom_target (check5 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^net_interface|^no_skip')
 
-add_custom_target (check5 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^net_interface|^router|^no_skip')
+add_custom_target (check6 COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --stop-on-failure --timeout 15 -R '^net_interface|^router|^no_skip')
 
 ###
 

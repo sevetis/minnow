@@ -45,6 +45,21 @@ int main()
       test.execute( IsFinished { true } );
     }
 
+    // test credit: Derek Askaryar
+    {
+      const uint32_t isn = uniform_int_distribution<uint32_t> { 0, UINT32_MAX }( rd );
+      TCPReceiverTestHarness test { "close 3", 2358 };
+      test.execute( SegmentArrives {}.with_syn().with_seqno( isn ) );
+      test.execute( ExpectAckno { Wrap32 { isn + 1 } } );
+      test.execute( SegmentArrives {}.with_seqno( isn + 1 ).with_data( "abc" ) );
+      test.execute( ReadAll { "abc" } );
+      test.execute( BytesPushed { 3 } );
+      test.execute( SegmentArrives {}.with_seqno( isn + 4 ).with_fin() );
+      test.execute( ExpectAckno { Wrap32 { isn + 5 } } );
+      test.execute( BytesPending { 0 } );
+      test.execute( IsClosed { true } );
+      test.execute( IsFinished { true } );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return 1;

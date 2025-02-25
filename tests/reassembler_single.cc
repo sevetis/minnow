@@ -84,6 +84,29 @@ int main()
       test.execute( BytesPushed( 1 ) );
       test.execute( IsFinished { false } );
     }
+
+    // credit: iberny
+    {
+      ReassemblerTestHarness test { "stream ends first I", 1000 };
+
+      test.execute( Insert { "", 4 }.is_last() );
+      test.execute( Insert { "abc", 0 } );
+
+      test.execute( BytesPushed( 3 ) );
+      test.execute( ReadAll( "abc" ) );
+      test.execute( IsFinished( false ) );
+    }
+
+    {
+      ReassemblerTestHarness test { "stream ends first II", 1000 };
+
+      test.execute( Insert { "", 3 }.is_last() );
+      test.execute( Insert { "abc", 0 } );
+
+      test.execute( BytesPushed( 3 ) );
+      test.execute( ReadAll( "abc" ) );
+      test.execute( IsFinished( true ) );
+    }
   } catch ( const exception& e ) {
     cerr << "Exception: " << e.what() << "\n";
     return EXIT_FAILURE;

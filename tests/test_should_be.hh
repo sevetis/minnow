@@ -52,10 +52,10 @@ inline std::string human_compare( uint64_t actual, uint64_t expected )
 {
   std::ostringstream ss;
   if ( actual > expected ) {
-    uint64_t diff = actual - expected;
+    const uint64_t diff = actual - expected;
     ss << "The actual value was too high by " << diff << human( diff ) << ".\n";
   } else {
-    uint64_t diff = expected - actual;
+    const uint64_t diff = expected - actual;
     ss << "The actual value was too low by " << diff << human( diff ) << ".\n";
   }
   return ss.str();
@@ -65,10 +65,10 @@ inline std::string human_compare( uint64_t actual, uint64_t expected )
 inline std::string human_compare( const Wrap32& actual, const Wrap32& expected )
 {
   std::ostringstream ss;
-  uint32_t actual_raw = minnow_conversions::DebugWrap32 { actual }.debug_get_raw_value();
-  uint32_t expected_raw = minnow_conversions::DebugWrap32 { expected }.debug_get_raw_value();
-  uint32_t diff_high = actual_raw - expected_raw;
-  uint32_t diff_low = expected_raw - actual_raw;
+  const uint32_t actual_raw = minnow_conversions::DebugWrap32 { actual }.debug_get_raw_value();
+  const uint32_t expected_raw = minnow_conversions::DebugWrap32 { expected }.debug_get_raw_value();
+  const uint32_t diff_high = actual_raw - expected_raw;
+  const uint32_t diff_low = expected_raw - actual_raw;
   if ( diff_high < diff_low ) {
     ss << "The Wrap32's raw value was too high by " << diff_high << human( diff_high ) << ".\n";
   } else {

@@ -278,6 +278,19 @@ int main()
         test.execute( ReadAll { move( data ) } );
       }
     }
+
+    // credit for test: Danica Xiong
+    {
+      const size_t cap = 4;
+      const uint32_t isn = 23452;
+      TCPReceiverTestHarness test { "retransmission of FIN", cap };
+      test.execute( SegmentArrives {}.with_syn().with_seqno( isn ) );
+      test.execute( SegmentArrives {}.with_seqno( isn + 1 ).with_data( "a" ) );
+      test.execute( SegmentArrives {}.with_fin().with_seqno( isn + 2 ) );
+      test.execute( ExpectAckno { Wrap32 { isn + 3 } } );
+      test.execute( SegmentArrives {}.with_fin().with_seqno( isn + 2 ) );
+      test.execute( ExpectAckno { Wrap32 { isn + 3 } } );
+    }
   } catch ( const exception& e ) {
     cerr << e.what() << "\n";
     return 1;
