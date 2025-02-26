@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <queue>
 #include <string>
 #include <string_view>
-#include <queue>
 
 class Reader;
 class Writer;

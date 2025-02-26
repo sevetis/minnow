@@ -31,10 +31,10 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
   const uint32_t next_ip = next_hop.ipv4_numeric();
   if ( arp_cache_.contains( next_ip ) ) {
     if ( timer_ < arp_cache_[next_ip].second ) {
-      transmit({
+      transmit( {
         { arp_cache_[next_ip].first, ethernet_address_, EthernetHeader::TYPE_IPv4 },
         serialize( dgram ),
-      });
+      } );
       return;
     }
     arp_cache_.erase( next_ip );
@@ -75,22 +75,15 @@ void NetworkInterface::recv_frame( EthernetFrame frame )
     auto& datagrams = pending_dgrams_[sender_ip];
     while ( !datagrams.empty() ) {
       if ( timer_ < datagrams.front().second )
-        transmit( { 
-  { header.src, ethernet_address_, EthernetHeader::TYPE_IPv4 },
-  serialize( datagrams.front().first )
-        } );
+        transmit(
+          { { header.src, ethernet_address_, EthernetHeader::TYPE_IPv4 }, serialize( datagrams.front().first ) } );
       datagrams.pop();
     }
     pending_dgrams_.erase( sender_ip );
-  }
-  else if ( target_ip == ip_address_.ipv4_numeric() ) {
-    const ARPMessage reply = make_arp_msg( 
-      ARPMessage::OPCODE_REPLY,
-      arp_msg.sender_ethernet_address,
-      sender_ip
-    );
+  } else if ( target_ip == ip_address_.ipv4_numeric() ) {
+    const ARPMessage reply = make_arp_msg( ARPMessage::OPCODE_REPLY, arp_msg.sender_ethernet_address, sender_ip );
     transmit( {
-    { reply.target_ethernet_address, ethernet_address_, EthernetHeader::TYPE_ARP },
+      { reply.target_ethernet_address, ethernet_address_, EthernetHeader::TYPE_ARP },
       serialize( reply ),
     } );
   }
@@ -102,12 +95,11 @@ void NetworkInterface::tick( const size_t ms_since_last_tick )
   timer_ += ms_since_last_tick;
 }
 
-ARPMessage NetworkInterface::make_arp_msg(uint16_t opcode, EthernetAddress target_ether_addr, uint32_t target_ip) {
-  return {
-    .opcode = opcode, 
-    .sender_ethernet_address = ethernet_address_, 
-    .sender_ip_address = ip_address_.ipv4_numeric(), 
-    .target_ethernet_address = target_ether_addr,
-    .target_ip_address = target_ip 
-  };
+ARPMessage NetworkInterface::make_arp_msg( uint16_t opcode, EthernetAddress target_ether_addr, uint32_t target_ip )
+{
+  return { .opcode = opcode,
+           .sender_ethernet_address = ethernet_address_,
+           .sender_ip_address = ip_address_.ipv4_numeric(),
+           .target_ethernet_address = target_ether_addr,
+           .target_ip_address = target_ip };
 }

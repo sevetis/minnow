@@ -120,8 +120,7 @@ void throw_timeout( int signal_number )
 
 Timeout::Timeout()
 {
-  struct sigaction action
-  {};
+  struct sigaction action {};
   action.sa_handler = throw_timeout;
   CheckSystemCall( "sigaction", sigaction( SIGPROF, &action, nullptr ) );
 }

@@ -3,14 +3,18 @@
 #include "exception.hh"
 #include "network_interface.hh"
 
-#include <optional>
 #include <map>
+#include <optional>
 
-struct Net {
+struct Net
+{
   uint32_t prefix;
   uint32_t mask;
   bool contain( const uint32_t ip ) const { return ( prefix & mask ) == ( ip & mask ); }
-  bool operator < ( const Net& other ) const { return mask > other.mask || ( mask == other.mask && prefix < other.prefix ); }
+  bool operator<( const Net& other ) const
+  {
+    return mask > other.mask || ( mask == other.mask && prefix < other.prefix );
+  }
 };
 
 // \brief A router that has multiple network interfaces and
@@ -45,4 +49,3 @@ private:
   // Routes table
   std::map<Net, std::pair<std::optional<Address>, size_t>> route_table_ {};
 };
-

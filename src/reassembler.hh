@@ -1,8 +1,8 @@
 #pragma once
 
 #include "byte_stream.hh"
-#include <map>
 #include <cstdint>
+#include <map>
 
 class Reassembler
 {
@@ -51,7 +51,7 @@ private:
   // internal storage
   std::map<uint64_t, std::string> pendings_ {};
   // store data into reassembler storage
-  void store_(uint64_t left, uint64_t right, std::string data);
+  void store_( uint64_t left, uint64_t right, std::string data );
   // push data in storage into byte stream
   void push_();
 };

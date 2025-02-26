@@ -25,7 +25,7 @@ void Router::add_route( const uint32_t route_prefix,
 // Go through all the interfaces, and route every incoming datagram to its proper outgoing interface.
 void Router::route()
 {
-  for ( auto& interface_: interfaces_ ) {
+  for ( auto& interface_ : interfaces_ ) {
     auto& dgrams = interface_->datagrams_received();
     while ( !dgrams.empty() ) {
       auto dgram = std::move( dgrams.front() );
@@ -36,13 +36,11 @@ void Router::route()
       dgram.header.ttl--;
       dgram.header.compute_checksum();
 
-      for ( const auto& [net, route]: route_table_ )
+      for ( const auto& [net, route] : route_table_ )
         if ( net.contain( dgram.header.dst ) ) {
           const auto& [next_hop, interface_num] = route;
-          interface( interface_num )->send_datagram(
-            dgram,
-            next_hop.value_or( Address::from_ipv4_numeric( dgram.header.dst ) )
-          );
+          interface( interface_num )
+            ->send_datagram( dgram, next_hop.value_or( Address::from_ipv4_numeric( dgram.header.dst ) ) );
           break;
         }
     }

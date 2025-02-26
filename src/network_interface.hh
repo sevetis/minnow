@@ -1,13 +1,13 @@
 #pragma once
 
 #include "address.hh"
+#include "arp_message.hh"
 #include "ethernet_frame.hh"
 #include "ipv4_datagram.hh"
-#include "arp_message.hh"
 
+#include <map>
 #include <memory>
 #include <queue>
-#include <map>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -76,7 +76,6 @@ private:
   std::shared_ptr<OutputPort> port_;
   void transmit( const EthernetFrame& frame ) const { port_->transmit( *this, frame ); }
 
-
   // Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
   EthernetAddress ethernet_address_;
 
@@ -87,12 +86,12 @@ private:
   std::queue<InternetDatagram> datagrams_received_ {};
 
   // Generate a request or reply arp message
-  ARPMessage make_arp_msg(uint16_t opcode, EthernetAddress target_ether_addr, uint32_t target_ip);
+  ARPMessage make_arp_msg( uint16_t opcode, EthernetAddress target_ether_addr, uint32_t target_ip );
 
   // Map ip to accroding ethernet address
   std::map<uint32_t, std::pair<EthernetAddress, uint64_t>> arp_cache_ {};
   std::map<uint32_t, std::queue<std::pair<InternetDatagram, uint64_t>>> pending_dgrams_ {};
-  
+
   uint64_t timer_ {};
   std::map<uint32_t, uint64_t> arp_expire_time_ {};
 
