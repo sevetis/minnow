@@ -28,7 +28,10 @@ protected:
   bool error_ {};
   bool closed_ {};
 
-  std::queue<char> stream {};
+  std::queue<std::string> stream_ {};
+  uint64_t front_poped_ {};
+
+  uint64_t buffered_ {};
   uint64_t pushed_ {};
   uint64_t popped_ {};
 };
