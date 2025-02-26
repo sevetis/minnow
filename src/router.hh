@@ -4,6 +4,14 @@
 #include "network_interface.hh"
 
 #include <optional>
+#include <map>
+
+struct Net {
+  uint32_t prefix;
+  uint32_t mask;
+  bool contain( const uint32_t ip ) const { return ( prefix & mask ) == ( ip & mask ); }
+  bool operator < ( const Net& other ) const { return mask > other.mask || ( mask == other.mask && prefix < other.prefix ); }
+};
 
 // \brief A router that has multiple network interfaces and
 // performs longest-prefix-match routing between them.
@@ -34,4 +42,7 @@ public:
 private:
   // The router's collection of network interfaces
   std::vector<std::shared_ptr<NetworkInterface>> interfaces_ {};
+  // Routes table
+  std::map<Net, std::pair<std::optional<Address>, size_t>> route_table_ {};
 };
+
